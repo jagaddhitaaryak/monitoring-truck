@@ -26,7 +26,6 @@
             transition: all 0.2s ease-in-out;
         }
 
-        /* Styling untuk Pop-up Filter Header */
         .header-filter-popup {
             position: absolute;
             background-color: white;
@@ -47,14 +46,13 @@
         th[data-filter] { cursor: pointer; position: relative; }
         th[data-filter]:hover { background-color: #eef2ff; }
         th[data-filter]::after {
-            content: '\f0d7'; /* Font Awesome down arrow */
+            content: '\f0d7';
             font-family: 'Font Awesome 6 Free';
             font-weight: 900;
             margin-left: 8px;
             color: #94a3b8;
         }
 
-        /* Styling untuk Modal */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.6); z-index: 1000;
@@ -83,14 +81,41 @@
     </div>
 
     <div id="login-container" class="min-h-screen flex items-center justify-center bg-slate-100 p-4 hidden">
-        <div class="w-full max-w-md bg-white p-8 rounded-xl shadow-lg">
-            <h2 class="text-3xl font-bold text-center text-slate-700 mb-2">Login Angkutan</h2>
-            <p class="text-center text-slate-500 mb-6">Silakan masuk</p>
-            <div class="space-y-4">
-                <div><label for="loginEmail" class="block text-sm font-medium text-slate-600 mb-1">Email</label><input type="email" id="loginEmail" placeholder="akun.angkutan@email.com" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500"></div>
-                <div><label for="loginPassword" class="block text-sm font-medium text-slate-600 mb-1">Password</label><input type="password" id="loginPassword" placeholder="••••••••" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500"></div>
-                <div id="loginError" class="text-red-500 text-sm"></div>
-                <button id="loginButton" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg shadow-sm hover:bg-indigo-700">Masuk</button>
+        <div class="w-full max-w-4xl bg-white rounded-xl shadow-2xl overflow-hidden md:flex">
+            <div class="hidden md:block md:w-1/2 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1622979205933-4d51c33d1808?q=80&w=2574&auto=format&fit=crop');">
+                <div class="h-full w-full bg-slate-900 bg-opacity-60 p-10 flex flex-col justify-between">
+                    <div>
+                        <h1 class="text-3xl font-bold tracking-wider text-white"><i class="fas fa-truck-moving mr-2"></i>LOG IKK</h1>
+                        <p class="text-slate-200 mt-2">Portal Monitoring & Update Status Truck.</p>
+                    </div>
+                    <div class="text-slate-100 text-sm">
+                        &copy; <span id="copyright-year-login-vendor"></span> Jagaddhita Arya Koswara
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full md:w-1/2 p-8 md:p-12">
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">Login Angkutan</h2>
+                <p class="text-slate-500 mb-8">Selamat datang, silakan masuk ke akun Anda.</p>
+                
+                <div class="space-y-6">
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                            <i class="fas fa-envelope text-slate-400"></i>
+                        </span>
+                        <input type="email" id="loginEmail" placeholder="Email" class="w-full p-3 pl-10 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 transition">
+                    </div>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                            <i class="fas fa-lock text-slate-400"></i>
+                        </span>
+                        <input type="password" id="loginPassword" placeholder="Password" class="w-full p-3 pl-10 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 transition">
+                    </div>
+                    
+                    <div id="loginError" class="text-red-500 text-sm h-4"></div>
+
+                    <button id="loginButton" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-transform transform hover:scale-105">Masuk</button>
+                </div>
             </div>
         </div>
     </div>
@@ -136,14 +161,45 @@
 
                 <main class="flex-grow p-4 md:p-6 lg:p-8 overflow-y-auto">
                     <div id="home" class="content-section">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                            <div class="bg-white p-6 rounded-xl shadow-md flex items-center">
-                                <div class="p-4 bg-indigo-100 rounded-full"><i class="fas fa-truck text-3xl text-indigo-600"></i></div>
+                        <div class="mb-8 p-6 bg-white rounded-xl shadow-md">
+                            <h2 id="welcome-title" class="text-2xl font-bold text-slate-800">Selamat Datang!</h2>
+                            <p id="current-date" class="text-slate-500"></p>
+                        </div>
+                    
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                            <div class="bg-indigo-600 text-white p-6 rounded-xl shadow-lg flex items-center">
+                                <div class="p-4 bg-indigo-500 rounded-full">
+                                    <i class="fas fa-truck text-3xl"></i>
+                                </div>
                                 <div class="ml-4">
-                                    <p class="text-slate-500 font-semibold">Total Truk Anda</p>
-                                    <p id="total-truck-count" class="text-3xl font-bold text-slate-800">0</p>
+                                    <p id="total-truck-title" class="font-semibold">Total Truk</p>
+                                    <p id="total-truck-count" class="text-3xl font-bold">0</p>
                                 </div>
                             </div>
+                            <div class="bg-green-600 text-white p-6 rounded-xl shadow-lg flex items-center">
+                                <div class="p-4 bg-green-500 rounded-full">
+                                    <i class="fas fa-route text-3xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="font-semibold">Truk Sedang Jalan</p>
+                                    <p id="active-truck-count" class="text-3xl font-bold">0</p>
+                                </div>
+                            </div>
+                            <div class="bg-slate-700 text-white p-6 rounded-xl shadow-lg flex items-center">
+                                <div class="p-4 bg-slate-600 rounded-full">
+                                    <i class="fas fa-check-circle text-3xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="font-semibold">Truk Tersedia</p>
+                                    <p id="available-truck-count" class="text-3xl font-bold">0</p>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-700 mb-4">Rincian Status Armada</h3>
+                            <div id="status-details-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                                </div>
                         </div>
                     </div>
                     <div id="statusTruck" class="content-section"><div id="readOnlyTruckList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div></div>
@@ -240,10 +296,8 @@
         let allRitaseData = []; 
         let ritaseSort = { column: 'timestamp_selesai', direction: 'desc' };
         let activeFilters = {};
-        // ===== START: MODAL SCRIPT VARIABLES =====
         let currentModalTrucks = [];
         let modalSort = { column: 'no_mobil', direction: 'asc' };
-        // ===== END: MODAL SCRIPT VARIABLES =====
         const appId = 'truck-dashboard-app';
         const statusOptions = ['TERSEDIA', 'OTW MUAT', 'ANTRI MUAT', 'MUAT', 'OTW CUSTOMER', 'ANTRI BONGKAR', 'INAP', 'STORING', 'NO DRIVER'];
         const statusInfo = { 'TERSEDIA': { icon: 'fa-check-circle', color: 'slate' }, 'OTW MUAT': { icon: 'fa-truck-loading', color: 'purple' }, 'ANTRI MUAT': { icon: 'fa-clock', color: 'cyan' }, 'MUAT': { icon: 'fa-box-open', color: 'blue' }, 'OTW CUSTOMER': { icon: 'fa-road', color: 'green' }, 'ANTRI BONGKAR': { icon: 'fa-hourglass-half', color: 'yellow' }, 'INAP': { icon: 'fa-bed', color: 'orange' }, 'STORING': { icon: 'fa-tools', color: 'red' }, 'NO DRIVER': { icon: 'fa-user-slash', color: 'rose' } };
@@ -308,7 +362,7 @@
                     }
                 });
         
-                updateDashboardCards(trucksData);
+                renderHomePage(trucksData);
                 renderSummaryReport(trucksData);
         
                 if (needsFullPageRender) {
@@ -323,19 +377,37 @@
             }, (error) => console.error("Gagal mengambil data truk: ", error));
         }
         
-        function updateDashboardCards(data) {
-             if (!data) return;
-             document.getElementById('total-truck-count').textContent = data.length;
-             const container = document.querySelector('#home .grid');
-             document.querySelectorAll('.status-card[data-status]').forEach(card => card.remove());
-             statusOptions.forEach(status => {
+        function renderHomePage(data) {
+            if (!data) return;
+
+            document.getElementById('welcome-title').textContent = `Selamat Datang, ${currentUserData.angkutanName}!`;
+            document.getElementById('current-date').textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('total-truck-title').textContent = "Total Truk Anda";
+
+            const totalTrucks = data.length;
+            const activeTrucks = data.filter(t => ['OTW MUAT', 'MUAT', 'OTW CUSTOMER', 'ANTRI BONGKAR', 'STORING'].includes(t.keterangan)).length;
+            const availableTrucks = data.filter(t => t.keterangan === 'TERSEDIA').length;
+
+            document.getElementById('total-truck-count').textContent = totalTrucks;
+            document.getElementById('active-truck-count').textContent = activeTrucks;
+            document.getElementById('available-truck-count').textContent = availableTrucks;
+
+            const container = document.getElementById('status-details-grid');
+            container.innerHTML = '';
+            statusOptions.forEach(status => {
                 const count = data.filter(truck => truck.keterangan === status).length;
+                if (count === 0) return;
+
                 const info = statusInfo[status] || { icon: 'fa-question-circle', color: 'gray' };
                 const card = document.createElement('div');
-                card.dataset.status = status;
                 card.className = 'bg-white p-6 rounded-xl shadow-md flex items-center status-card';
                 card.style.cursor = 'pointer';
-                card.innerHTML = `<div class="p-4 bg-${info.color}-100 rounded-full"><i class="fas ${info.icon} text-3xl text-${info.color}-600"></i></div><div class="ml-4"><p class="text-slate-500 font-semibold">${status}</p><p class="text-3xl font-bold text-slate-800">${count}</p></div>`;
+                card.innerHTML = `
+                    <div class="p-3 bg-${info.color}-100 rounded-full"><i class="fas ${info.icon} text-2xl text-${info.color}-600"></i></div>
+                    <div class="ml-4">
+                        <p class="text-slate-500 font-semibold">${status}</p>
+                        <p class="text-2xl font-bold text-slate-800">${count}</p>
+                    </div>`;
                 card.onclick = () => window.showTrucksByStatus(status);
                 container.appendChild(card);
             });
@@ -484,7 +556,6 @@
             });
         }
         
-        // --- FUNGSI UNTUK RITASE DENGAN FILTER POP-UP DI HEADER ---
         let currentFilterColumn = null;
 
         function closeFilterPopup() {
@@ -637,7 +708,6 @@
             }
         }
 
-        // ===== START: FUNGSI-FUNGSI BARU UNTUK MODAL =====
         window.showTrucksByStatus = (status) => {
             const modal = document.getElementById('status-modal');
             const modalTitle = document.getElementById('modal-title');
@@ -646,9 +716,9 @@
             currentModalTrucks = trucksData.filter(truck => truck.keterangan === status);
             modalTitle.textContent = `Daftar Truk: ${status}`;
             searchInput.value = '';
-            modalSort = { column: 'no_mobil', direction: 'asc' }; // Reset sort
+            modalSort = { column: 'no_mobil', direction: 'asc' };
             
-            applyModalFiltersAndSort(); // Terapkan filter & sort awal
+            applyModalFiltersAndSort();
             modal.classList.remove('hidden');
         };
 
@@ -710,34 +780,25 @@
             }
             applyModalFiltersAndSort();
         };
-        // ===== END: FUNGSI-FUNGSI BARU UNTUK MODAL =====
         
-        // ===== START: FUNGSI JAM REAL-TIME =====
         function updateRealTimeClock() {
-            // Cari elemen untuk menampilkan waktu
             const clockElement = document.getElementById('export-timestamp');
-            
-            // Pastikan elemen ada di halaman yang aktif untuk menghindari error
             if (clockElement) {
                 const now = new Date();
                 const options = {
                     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
                     hour: '2-digit', minute: '2-digit', second: '2-digit'
                 };
-                // Format waktu ke dalam Bahasa Indonesia
                 clockElement.textContent = now.toLocaleString('id-ID', options);
             }
         }
-        // ===== END: FUNGSI JAM REAL-TIME =====
 
-        // ===== START: FUNGSI-FUNGSI EKSPOR =====
         function getFormattedTimestamp() {
             const now = new Date();
             const options = {
                 weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
                 hour: '2-digit', minute: '2-digit', second: '2-digit', timeZoneName: 'short'
             };
-            // Menggunakan locale 'id-ID' untuk format Indonesia
             return now.toLocaleString('id-ID', options);
         }
 
@@ -754,12 +815,8 @@
         window.exportToExcel = () => {
             const timestamp = getFormattedTimestamp();
             document.getElementById('export-timestamp').textContent = `Data diekspor pada: ${timestamp}`;
-            
-            // Mengambil tabel dari DOM
             const table = document.getElementById('summaryTable');
             const workbook = XLSX.utils.table_to_book(table, {sheet: "Summary Report"});
-            
-            // Membuat nama file dengan timestamp
             const filename = `Summary_Report_${getFilenameTimestamp()}.xlsx`;
             XLSX.writeFile(workbook, filename);
         };
@@ -768,28 +825,20 @@
             const timestamp = getFormattedTimestamp();
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            
             document.getElementById('export-timestamp').textContent = `Data diekspor pada: ${timestamp}`;
-
-            // Menambahkan Judul dan Timestamp ke PDF
             doc.text("Summary Report Logistik", 14, 15);
             doc.setFontSize(10);
             doc.setTextColor(100);
             doc.text(`Diekspor pada: ${timestamp}`, 14, 22);
-
-            // Menggunakan autoTable untuk mengkonversi tabel HTML ke PDF
             doc.autoTable({
                 html: '#summaryTable',
-                startY: 28, // Posisi awal tabel setelah judul
+                startY: 28,
                 theme: 'grid',
-                headStyles: { fillColor: [79, 70, 229] } // Warna header (indigo)
+                headStyles: { fillColor: [79, 70, 229] }
             });
-            
-            // Membuat nama file dengan timestamp
             const filename = `Summary_Report_${getFilenameTimestamp()}.pdf`;
             doc.save(filename);
         };
-        // ===== END: FUNGSI-FUNGSI EKSPOR =====
 
         const pageTitles = { home: 'Home', statusTruck: 'Status Truck (View Only)', updateStatus: 'Update Status Truck', updateDimensi: 'Update Dimensi Truck', ritaseTruck: 'Laporan Ritase Truck', summaryReport: 'Summary Report' };
         window.showContent = (contentId) => {
@@ -814,11 +863,15 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             setInterval(updateRealTimeClock, 1000);
-
+            if (document.getElementById('copyright-year-login-admin')) {
+                document.getElementById('copyright-year-login-admin').textContent = new Date().getFullYear();
+            }
+            if (document.getElementById('copyright-year-login-vendor')) {
+                document.getElementById('copyright-year-login-vendor').textContent = new Date().getFullYear();
+            }
             document.getElementById('loginButton').addEventListener('click', () => signInWithEmailAndPassword(auth, document.getElementById('loginEmail').value, document.getElementById('loginPassword').value).catch(e => document.getElementById('loginError').textContent = 'Email atau password salah.'));
             document.getElementById('logoutButton').addEventListener('click', () => signOut(auth));
             document.getElementById('copyright-year').textContent = new Date().getFullYear();
-            
             document.getElementById('apply-filter-btn').addEventListener('click', applyHeaderFilters);
             document.getElementById('clear-filter-btn').addEventListener('click', clearHeaderFilters);
             document.addEventListener('click', (event) => {
