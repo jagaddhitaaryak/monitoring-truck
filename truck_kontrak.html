@@ -139,7 +139,10 @@
                     <a href="#" id="nav-summaryReport" class="sidebar-link flex items-center mt-2 px-4 py-3 rounded-lg font-semibold hover:bg-slate-700" onclick="window.showContent('summaryReport')">
                         <i class="fas fa-chart-pie w-6 text-center"></i><span class="ml-3">Summary Report</span>
                     </a>
-                </nav>
+                    <a href="#" id="nav-logHistory" class="sidebar-link flex items-center mt-2 px-4 py-3 rounded-lg font-semibold hover:bg-slate-700" onclick="window.showContent('logHistory')">
+                        <i class="fas fa-history w-6 text-center"></i><span class="ml-3">Riwayat Log</span>
+                    </a>
+                    </nav>
             </aside>
 
             <div class="flex-1 flex flex-col overflow-hidden">
@@ -214,7 +217,7 @@
                     <div id="listTruck" class="content-section">
                         <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
                             <button class="flex items-center gap-2 bg-indigo-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-indigo-700" onclick="window.toggleAddForm()"><i class="fas fa-plus"></i> Tambah Data</button>
-                            <div class="relative w-full md:w-1/3"><span class="absolute inset-y-0 left-0 flex items-center pl-3"><i class="fas fa-search text-slate-400"></i></span><input type="text" id="searchInput" placeholder="Cari data truk..." class="w-full p-2 pl-10 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500"></div>
+                            <div class="relative w-full md:w-1/3"><span class="absolute inset-y-0 left-0 flex items-center pl-3"><i class="fas fa-search text-slate-400"></i></span><input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Cari data truk..." class="w-full p-2 pl-10 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500"></div>
                         </div>
                         
                         <form class="add-form hidden bg-white p-6 rounded-xl shadow-md mb-6" id="addForm">
@@ -237,8 +240,37 @@
                     </div>
 
                     <div id="ritaseTruck" class="content-section">
+                        <div class="bg-white p-4 rounded-xl shadow-md mb-6">
+                            <h4 class="text-lg font-semibold text-slate-700 mb-4">Filter Berdasarkan Tanggal Selesai</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                                <div>
+                                    <label for="ritaseStartDate" class="block text-sm font-medium text-slate-600 mb-1">Dari Tanggal</label>
+                                    <input type="date" id="ritaseStartDate" class="w-full p-2 border border-slate-300 rounded-lg">
+                                </div>
+                                <div>
+                                    <label for="ritaseEndDate" class="block text-sm font-medium text-slate-600 mb-1">Sampai Tanggal</label>
+                                    <input type="date" id="ritaseEndDate" class="w-full p-2 border border-slate-300 rounded-lg">
+                                </div>
+                                <div class="flex gap-2">
+                                    <button id="applyDateFilterBtn" class="w-full bg-indigo-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-indigo-700">
+                                        <i class="fas fa-filter mr-2"></i>Terapkan
+                                    </button>
+                                    <button id="resetDateFilterBtn" class="w-full bg-slate-200 text-slate-800 font-semibold px-4 py-2 rounded-lg hover:bg-slate-300">
+                                        Reset
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex justify-end items-center gap-2 mb-4">
+                            <button onclick="window.exportRitaseToExcel()" class="flex items-center gap-2 bg-green-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-green-700 text-sm">
+                                <i class="fas fa-file-excel"></i> Export Excel
+                            </button>
+                            <button onclick="window.exportRitaseToPdf()" class="flex items-center gap-2 bg-red-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-red-700 text-sm">
+                                <i class="fas fa-file-pdf"></i> Export PDF
+                            </button>
+                        </div>
                         <div class="bg-white rounded-xl shadow-md overflow-x-auto">
-                            <table class="w-full text-sm text-left text-slate-600">
+                            <table id="ritaseTable" class="w-full text-sm text-left text-slate-600">
                                 <thead class="text-xs text-slate-700 uppercase bg-slate-100">
                                     <tr>
                                         <th class="px-6 py-3" data-filter="angkutanName" onclick="handleHeaderClick(event, 'angkutanName')">Angkutan</th>
@@ -286,6 +318,8 @@
                                     <tr>
                                         <th class="px-6 py-3">ANGKUTAN</th>
                                         <th class="px-6 py-3">FO</th>
+                                        <th class="px-6 py-3">NAMA CUSTOMER</th>
+                                        <th class="px-6 py-3">KOTA</th>
                                         <th class="px-6 py-3">STATUS</th>
                                         <th class="px-6 py-3">NAMA DRIVER</th>
                                         <th class="px-6 py-3">NO HP</th>
@@ -297,7 +331,56 @@
                             </table>
                         </div>
                     </div>
-                </main>
+
+                    <div id="logHistory" class="content-section">
+                        <div class="bg-white p-4 rounded-xl shadow-md mb-6">
+                            <h4 class="text-lg font-semibold text-slate-700 mb-4">Filter Riwayat Log</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                                <div>
+                                    <label for="logStartDate" class="block text-sm font-medium text-slate-600 mb-1">Dari Tanggal</label>
+                                    <input type="date" id="logStartDate" class="w-full p-2 border border-slate-300 rounded-lg">
+                                </div>
+                                <div>
+                                    <label for="logEndDate" class="block text-sm font-medium text-slate-600 mb-1">Sampai Tanggal</label>
+                                    <input type="date" id="logEndDate" class="w-full p-2 border border-slate-300 rounded-lg">
+                                </div>
+                                <div class="md:col-span-2">
+                                     <label for="logSearchInput" class="block text-sm font-medium text-slate-600 mb-1">Cari (Plat, Angkutan, Pengubah)</label>
+                                     <input type="text" id="logSearchInput" placeholder="Masukkan kata kunci..." class="w-full p-2 border border-slate-300 rounded-lg">
+                                </div>
+                            </div>
+                             <div class="flex justify-end gap-2 mt-4">
+                                <button id="applyLogFilterBtn" class="bg-indigo-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-indigo-700">
+                                    <i class="fas fa-filter mr-2"></i>Filter
+                                </button>
+                                <button id="resetLogFilterBtn" class="bg-slate-200 text-slate-800 font-semibold px-4 py-2 rounded-lg hover:bg-slate-300">
+                                    Reset
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end items-center gap-2 mb-4">
+                            <button onclick="window.exportLogsToExcel()" class="flex items-center gap-2 bg-green-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-green-700 text-sm">
+                                <i class="fas fa-file-excel"></i> Export Excel
+                            </button>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-md overflow-x-auto">
+                            <table id="logHistoryTable" class="w-full text-sm text-left text-slate-600">
+                                <thead class="text-xs text-slate-700 uppercase bg-slate-100">
+                                    <tr>
+                                        <th class="px-6 py-3">Waktu</th>
+                                        <th class="px-6 py-3">Plat Nomor</th>
+                                        <th class="px-6 py-3">Angkutan</th>
+                                        <th class="px-6 py-3">Status Lama</th>
+                                        <th class="px-6 py-3">Status Baru</th>
+                                        <th class="px-6 py-3">Diubah Oleh</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="logHistoryTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    </main>
                 <footer class="text-center p-4 text-sm text-slate-500 mt-auto bg-white border-t">&copy; <span id="copyright-year"></span> Jagaddhita Arya Koswara - Logistik IKK</footer>
             </div>
         </div>
@@ -330,6 +413,27 @@
         </div>
     </div>
 
+    <div id="log-modal" class="modal-overlay hidden" onclick="window.closeLogModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="modal-close" onclick="window.closeLogModal()">&times;</span>
+            <h3 id="log-modal-title" class="text-2xl font-bold text-slate-800 mb-4">Log Perubahan Status</h3>
+            <div class="modal-body">
+                <table class="w-full text-sm text-left text-slate-600">
+                    <thead class="text-xs text-slate-700 uppercase bg-slate-100">
+                        <tr>
+                            <th class="px-4 py-3">Waktu</th>
+                            <th class="px-4 py-3">Status Lama</th>
+                            <th class="px-4 py-3">Status Baru</th>
+                            <th class="px-4 py-3">Diubah Oleh</th>
+                        </tr>
+                    </thead>
+                    <tbody id="log-modal-table-body">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <div id="header-filter-popup" class="header-filter-popup hidden">
         <input type="text" id="filter-search" class="w-full p-2 border border-slate-300 rounded-md mb-2" placeholder="Cari opsi...">
         <div id="filter-options" class="filter-options"></div>
@@ -342,10 +446,11 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, collection, onSnapshot, addDoc, updateDoc, deleteDoc, getDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, collection, onSnapshot, addDoc, updateDoc, deleteDoc, getDoc, query, orderBy, where, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         window.trucksData = []; 
         window.allRitaseData = [];
+        window.allLogData = []; // Variabel baru untuk menyimpan semua data log
         let jenisMobilOptions = [];
         let db, auth, currentUserData, unsubscribeFromTrucks, unsubscribeFromRitase;
         
@@ -526,7 +631,11 @@
                 <td data-field="customer" class="px-6 py-4">${truck.customer || '-'}</td><td data-field="tujuan" class="px-6 py-4">${truck.tujuan || '-'}</td>
                 <td data-field="waktu" class="px-6 py-4">${waktuDisplay}</td><td data-field="nama_driver" class="px-6 py-4">${truck.nama_driver || '-'}</td>
                 <td data-field="no_hp" class="px-6 py-4">${truck.no_hp || '-'}</td><td data-field="fo" class="px-6 py-4">${truck.fo || '-'}</td>
-                <td class="px-6 py-4 action-buttons flex items-center gap-2"><button class="edit p-2 text-xs text-white bg-amber-500 rounded-lg hover:bg-amber-600" onclick="window.editRow('${truck.firestoreId}')"><i class="fas fa-pencil-alt"></i></button><button class="delete p-2 text-xs text-white bg-red-600 rounded-lg hover:bg-red-700" onclick="window.deleteTruck('${truck.firestoreId}', '${truck.no_mobil}')"><i class="fas fa-trash"></i></button></td>`;
+                <td class="px-6 py-4 action-buttons flex items-center gap-2">
+                    <button class="log p-2 text-xs text-white bg-sky-500 rounded-lg hover:bg-sky-600" title="Lihat Log" onclick="window.showStatusLog('${truck.firestoreId}', '${truck.no_mobil}')"><i class="fas fa-history"></i></button>
+                    <button class="edit p-2 text-xs text-white bg-amber-500 rounded-lg hover:bg-amber-600" title="Edit" onclick="window.editRow('${truck.firestoreId}')"><i class="fas fa-pencil-alt"></i></button>
+                    <button class="delete p-2 text-xs text-white bg-red-600 rounded-lg hover:bg-red-700" title="Hapus" onclick="window.deleteTruck('${truck.firestoreId}', '${truck.no_mobil}')"><i class="fas fa-trash"></i></button>
+                </td>`;
         }
 
         function filterTable() {
@@ -573,8 +682,35 @@
                 const input = cell.querySelector('input, select');
                 if (input) updatedData[field] = input.value;
             });
-            try { await updateDoc(doc(db, `artifacts/${appId}/public/data/trucks`, firestoreId), updatedData); } 
-            catch (error) { alert("Gagal menyimpan perubahan."); }
+            
+            const truckDocRef = doc(db, `artifacts/${appId}/public/data/trucks`, firestoreId);
+
+            try {
+                const newStatus = updatedData.keterangan;
+                if (newStatus) {
+                    const docSnap = await getDoc(truckDocRef);
+                    if (docSnap.exists()) {
+                        const oldStatus = docSnap.data().keterangan;
+                        if (oldStatus !== newStatus) {
+                            await addDoc(collection(db, "truck_status_logs"), {
+                                truckId: firestoreId,
+                                plat_nomor: docSnap.data().no_mobil,
+                                angkutanName: docSnap.data().angkutan,
+                                oldStatus: oldStatus,
+                                newStatus: newStatus,
+                                changedBy: currentUserData.name || 'Admin',
+                                timestamp: serverTimestamp()
+                            });
+                        }
+                    }
+                }
+                
+                await updateDoc(truckDocRef, updatedData); 
+
+            } catch (error) { 
+                console.error("Gagal menyimpan data atau membuat log:", error);
+                alert("Gagal menyimpan perubahan."); 
+            }
         };
 
         window.deleteTruck = async (firestoreId, noMobil) => {
@@ -637,7 +773,7 @@
             const kubikasi = (p * l * t / 1000000).toFixed(2);
             const [tanggal, jam] = (truck.waktu || 'T').split('T');
             const waktuDisplay = tanggal && jam ? `${tanggal}, ${jam}` : '-';
-            card.innerHTML = `<div class="flex justify-between items-start"><h3 class="text-lg font-bold text-slate-800">${truck.no_mobil}</h3><span class="px-3 py-1 text-xs font-semibold leading-tight rounded-full ${badgeClasses}">${truck.keterangan || 'N/A'}</span></div><p class="text-sm text-slate-500 mb-4">${truck.jenis_mobil || ''}</p><div class="border-t border-slate-200 pt-4 mt-4 space-y-2 text-sm"><div class="flex justify-between"><span class="text-slate-500 font-medium">Customer:</span><span class="text-slate-700 font-semibold">${truck.customer || '-'}</span></div><div class="flex justify-between"><span class="text-slate-500 font-medium">Kota:</span><span class="text-slate-700 font-semibold">${truck.tujuan || '-'}</span></div><div class="flex justify-between"><span class="text-slate-500 font-medium">Waktu:</span><span class="text-slate-700 font-semibold">${waktuDisplay}</span></div><div class="flex justify-between"><span class="text-slate-500 font-medium">Driver:</span><span class="text-slate-700 font-semibold">${truck.nama_driver || '-'}</span></div><div class="flex justify-between"><span class="text-slate-500 font-medium">No HP:</span><span class="text-slate-700 font-semibold">${truck.no_hp || '-'}</span></div><div class="flex justify-between"><span class="text-slate-500 font-medium">No. FO:</span><span class="text-slate-700 font-semibold">${truck.fo || '-'}</span></div></div><div class="border-t border-slate-200 pt-2 mt-2 space-y-2 text-sm"><div class="flex justify-between"><span class="text-slate-500 font-medium">Dimensi:</span><span class="text-slate-700 font-semibold">${p}×${l}×${t} cm</span></div><div class="flex justify-between"><span class="text-slate-500 font-medium">Kubikasi:</span><span class="text-slate-700 font-bold text-indigo-600">${kubikasi} m³</span></div></div>`;
+            card.innerHTML = `<div class="flex justify-between items-start"><h3 class="text-lg font-bold text-slate-800">${truck.no_mobil}</h3><span class="px-3 py-1 text-xs font-semibold leading-tight rounded-full ${badgeClasses}">${truck.keterangan || 'N/A'}</span></div><p class="text-sm text-slate-500 mb-4">${truck.jenis_mobil || ''}</p><div class="border-t border-slate-200 pt-4 mt-4 space-y-2 text-sm"><div class="flex justify-between"><span class="text-slate-500 font-medium">Customer:</span><span class="text-slate-700 font-semibold">${truck.customer || '-'}</span></div><div class="flex justify-between"><span class="text-slate-500 font-medium">Kota:</span><span class="text-slate-700 font-semibold">${truck.tujuan || '-'}</span></div><div class="flex justify-between"><span class="text-slate-500 font-medium">Terakhir Update Status:</span><span class="text-slate-700 font-semibold">${waktuDisplay}</span></div><div class="flex justify-between"><span class="text-slate-500 font-medium">Driver:</span><span class="text-slate-700 font-semibold">${truck.nama_driver || '-'}</span></div><div class="flex justify-between"><span class="text-slate-500 font-medium">No HP:</span><span class="text-slate-700 font-semibold">${truck.no_hp || '-'}</span></div><div class="flex justify-between"><span class="text-slate-500 font-medium">No. FO:</span><span class="text-slate-700 font-semibold">${truck.fo || '-'}</span></div></div><div class="border-t border-slate-200 pt-2 mt-2 space-y-2 text-sm"><div class="flex justify-between"><span class="text-slate-500 font-medium">Dimensi:</span><span class="text-slate-700 font-semibold">${p}×${l}×${t} cm</span></div><div class="flex justify-between"><span class="text-slate-500 font-medium">Kubikasi:</span><span class="text-slate-700 font-bold text-indigo-600">${kubikasi} m³</span></div></div>`;
         }
         
         function populateSummaryFilters() {
@@ -655,10 +791,10 @@
             if (selectedJenisMobil !== 'all') filteredData = filteredData.filter(t => t.jenis_mobil === selectedJenisMobil);
             if (selectedStatus !== 'all') filteredData = filteredData.filter(t => t.keterangan === selectedStatus);
             const tableBody = document.getElementById('summaryTableBody'); tableBody.innerHTML = '';
-            if (filteredData.length === 0) { tableBody.innerHTML = `<tr><td colspan="7" class="text-center p-8 text-slate-500">Tidak ada data.</td></tr>`; return; }
+            if (filteredData.length === 0) { tableBody.innerHTML = `<tr><td colspan="9" class="text-center p-8 text-slate-500">Tidak ada data.</td></tr>`; return; }
             filteredData.forEach(truck => {
                 const badgeClasses = statusBadgeMap[truck.keterangan] || 'bg-slate-100 text-slate-800';
-                tableBody.innerHTML += `<tr class="bg-white border-b"><td class="px-6 py-4 font-medium">${truck.angkutan || '-'}</td><td class="px-6 py-4">${truck.fo || '-'}</td><td class="px-6 py-4"><span class="px-3 py-1 text-xs font-semibold leading-tight rounded-full ${badgeClasses}">${truck.keterangan || '-'}</span></td><td class="px-6 py-4">${truck.nama_driver || '-'}</td><td class="px-6 py-4">${truck.no_hp || '-'}</td><td class="px-6 py-4">${truck.no_mobil || '-'}</td><td class="px-6 py-4">${truck.jenis_mobil || '-'}</td></tr>`;
+                tableBody.innerHTML += `<tr class="bg-white border-b"><td class="px-6 py-4 font-medium">${truck.angkutan || '-'}</td><td class="px-6 py-4">${truck.fo || '-'}</td><td class="px-6 py-4">${truck.customer || '-'}</td><td class="px-6 py-4">${truck.tujuan || '-'}</td><td class="px-6 py-4"><span class="px-3 py-1 text-xs font-semibold leading-tight rounded-full ${badgeClasses}">${truck.keterangan || '-'}</span></td><td class="px-6 py-4">${truck.nama_driver || '-'}</td><td class="px-6 py-4">${truck.no_hp || '-'}</td><td class="px-6 py-4">${truck.no_mobil || '-'}</td><td class="px-6 py-4">${truck.jenis_mobil || '-'}</td></tr>`;
             });
         }
         
@@ -737,6 +873,49 @@
         window.closeModal = () => {
             document.getElementById('status-modal').classList.add('hidden');
         }
+
+        window.showStatusLog = async (truckId, platNomor) => {
+            const modal = document.getElementById('log-modal');
+            const title = document.getElementById('log-modal-title');
+            const tableBody = document.getElementById('log-modal-table-body');
+            
+            title.textContent = `Log Perubahan Status - ${platNomor}`;
+            tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-8 text-slate-500"><i class="fas fa-spinner fa-spin mr-2"></i>Memuat log...</td></tr>`;
+            modal.classList.remove('hidden');
+
+            try {
+                const logsRef = collection(db, "truck_status_logs");
+                const q = query(logsRef, where("truckId", "==", truckId), orderBy("timestamp", "desc"));
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-8 text-slate-500">Tidak ada riwayat perubahan status untuk truk ini.</td></tr>`;
+                    return;
+                }
+
+                tableBody.innerHTML = '';
+                querySnapshot.forEach(doc => {
+                    const log = doc.data();
+                    const timestamp = log.timestamp?.toDate() ? log.timestamp.toDate().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }) : 'N/A';
+                    const row = `
+                        <tr class="border-b hover:bg-slate-50">
+                            <td class="px-4 py-3">${timestamp}</td>
+                            <td class="px-4 py-3"><span class="px-2 py-1 text-xs font-semibold rounded-full ${statusBadgeMap[log.oldStatus] || ''}">${log.oldStatus}</span></td>
+                            <td class="px-4 py-3"><span class="px-2 py-1 text-xs font-semibold rounded-full ${statusBadgeMap[log.newStatus] || ''}">${log.newStatus}</span></td>
+                            <td class="px-4 py-3 font-medium">${log.changedBy}</td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                });
+            } catch (error) {
+                console.error("Gagal memuat log:", error);
+                tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-8 text-red-500">Gagal memuat riwayat.</td></tr>`;
+            }
+        };
+
+        window.closeLogModal = () => {
+            document.getElementById('log-modal').classList.add('hidden');
+        };
         
         let currentFilterColumn = null;
 
@@ -834,6 +1013,26 @@
         function applyRitaseFiltersAndSort() {
             let filtered = [...window.allRitaseData];
 
+            const startDateString = document.getElementById('ritaseStartDate').value;
+            const endDateString = document.getElementById('ritaseEndDate').value;
+
+            if (startDateString || endDateString) {
+                const startDate = startDateString ? new Date(startDateString) : null;
+                const endDate = endDateString ? new Date(endDateString) : null;
+
+                if(startDate) startDate.setHours(0, 0, 0, 0);
+                if(endDate) endDate.setHours(23, 59, 59, 999);
+
+                filtered = filtered.filter(item => {
+                    if (!item.timestamp_selesai || !item.timestamp_selesai.toDate) return false;
+                    const itemDate = item.timestamp_selesai.toDate();
+                    
+                    if (startDate && itemDate < startDate) return false;
+                    if (endDate && itemDate > endDate) return false;
+                    return true;
+                });
+            }
+
             for (const column in activeFilters) {
                 if (activeFilters[column] && activeFilters[column].length > 0) {
                     filtered = filtered.filter(item => activeFilters[column].includes(String(item[column])));
@@ -855,6 +1054,85 @@
             displayRitaseTable(filtered);
         }
         
+        // ===== FUNGSI BARU UNTUK HALAMAN LOG =====
+        async function fetchAndRenderLogs() {
+            const tableBody = document.getElementById('logHistoryTableBody');
+            tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-slate-500"><i class="fas fa-spinner fa-spin mr-2"></i>Memuat data log...</td></tr>`;
+            try {
+                const logsRef = collection(db, "truck_status_logs");
+                const q = query(logsRef, orderBy("timestamp", "desc"));
+                const querySnapshot = await getDocs(q);
+                window.allLogData = querySnapshot.docs.map(doc => ({...doc.data(), docId: doc.id}));
+                applyLogFiltersAndSort();
+            } catch (error) {
+                console.error("Gagal memuat data log:", error);
+                tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-red-500">Gagal memuat data log.</td></tr>`;
+            }
+        }
+
+        function applyLogFiltersAndSort() {
+            let filtered = [...window.allLogData];
+            const startDateString = document.getElementById('logStartDate').value;
+            const endDateString = document.getElementById('logEndDate').value;
+            const searchTerm = document.getElementById('logSearchInput').value.toLowerCase();
+
+            if (startDateString || endDateString) {
+                const startDate = startDateString ? new Date(startDateString) : null;
+                const endDate = endDateString ? new Date(endDateString) : null;
+                if(startDate) startDate.setHours(0, 0, 0, 0);
+                if(endDate) endDate.setHours(23, 59, 59, 999);
+
+                filtered = filtered.filter(item => {
+                    if (!item.timestamp || !item.timestamp.toDate) return false;
+                    const itemDate = item.timestamp.toDate();
+                    if (startDate && itemDate < startDate) return false;
+                    if (endDate && itemDate > endDate) return false;
+                    return true;
+                });
+            }
+
+            if (searchTerm) {
+                filtered = filtered.filter(log => {
+                    return (log.plat_nomor?.toLowerCase().includes(searchTerm) || 
+                            log.angkutanName?.toLowerCase().includes(searchTerm) || 
+                            log.changedBy?.toLowerCase().includes(searchTerm));
+                });
+            }
+            
+            displayLogTable(filtered);
+        }
+        
+        function displayLogTable(dataToRender) {
+            const tableBody = document.getElementById('logHistoryTableBody');
+            tableBody.innerHTML = '';
+            if (!dataToRender || dataToRender.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-slate-500">Tidak ada data log yang cocok.</td></tr>`;
+                return;
+            }
+            dataToRender.forEach(log => {
+                const timestamp = log.timestamp?.toDate() ? log.timestamp.toDate().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }) : '-';
+                const row = `
+                    <tr class="border-b hover:bg-slate-50">
+                        <td class="px-6 py-4">${timestamp}</td>
+                        <td class="px-6 py-4 font-medium">${log.plat_nomor || '-'}</td>
+                        <td class="px-6 py-4">${log.angkutanName || '-'}</td>
+                        <td class="px-6 py-4"><span class="px-2 py-1 text-xs font-semibold rounded-full ${statusBadgeMap[log.oldStatus] || ''}">${log.oldStatus || '-'}</span></td>
+                        <td class="px-6 py-4"><span class="px-2 py-1 text-xs font-semibold rounded-full ${statusBadgeMap[log.newStatus] || ''}">${log.newStatus || '-'}</span></td>
+                        <td class="px-6 py-4">${log.changedBy || '-'}</td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+        }
+
+        window.exportLogsToExcel = () => {
+            const table = document.getElementById('logHistoryTable');
+            const workbook = XLSX.utils.table_to_book(table, {sheet: "Riwayat Log"});
+            const filename = `Riwayat_Log_Status_Truck_${getFilenameTimestamp()}.xlsx`;
+            XLSX.writeFile(workbook, filename);
+        };
+        // ===== AKHIR FUNGSI BARU =====
+
         window.sortRitaseTable = (column) => {
             if (ritaseSort.column === column) {
                 ritaseSort.direction = ritaseSort.direction === 'asc' ? 'desc' : 'asc';
@@ -877,20 +1155,14 @@
             const clockElement = document.getElementById('export-timestamp');
             if (clockElement) {
                 const now = new Date();
-                const options = {
-                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-                    hour: '2-digit', minute: '2-digit', second: '2-digit'
-                };
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
                 clockElement.textContent = now.toLocaleString('id-ID', options);
             }
         }
 
         function getFormattedTimestamp() {
             const now = new Date();
-            const options = {
-                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-                hour: '2-digit', minute: '2-digit', second: '2-digit', timeZoneName: 'short'
-            };
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZoneName: 'short' };
             return now.toLocaleString('id-ID', options);
         }
 
@@ -907,9 +1179,12 @@
         window.exportToExcel = () => {
             const timestamp = getFormattedTimestamp();
             document.getElementById('export-timestamp').textContent = `Data diekspor pada: ${timestamp}`;
+            const angkutanSelect = document.getElementById('summaryFilterAngkutan');
+            const selectedAngkutanName = angkutanSelect.options[angkutanSelect.selectedIndex].text;
+            const cleanAngkutanName = selectedAngkutanName.replace(/ /g, '_');
             const table = document.getElementById('summaryTable');
-            const workbook = XLSX.utils.table_to_book(table, {sheet: "Summary Report"});
-            const filename = `Summary_Report_${getFilenameTimestamp()}.xlsx`;
+            const workbook = XLSX.utils.table_to_book(table, {sheet: `Summary Status Truck`});
+            const filename = `Summary_Status_Truck_${cleanAngkutanName}_${getFilenameTimestamp()}.xlsx`;
             XLSX.writeFile(workbook, filename);
         };
 
@@ -918,21 +1193,41 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             document.getElementById('export-timestamp').textContent = `Data diekspor pada: ${timestamp}`;
-            doc.text("Summary Report Logistik", 14, 15);
+            const angkutanSelect = document.getElementById('summaryFilterAngkutan');
+            const selectedAngkutanName = angkutanSelect.options[angkutanSelect.selectedIndex].text;
+            const title = `Summary Status Truck - ${selectedAngkutanName}`;
+            const cleanAngkutanName = selectedAngkutanName.replace(/ /g, '_');
+            doc.text(title, 14, 15); 
             doc.setFontSize(10);
             doc.setTextColor(100);
             doc.text(`Diekspor pada: ${timestamp}`, 14, 22);
-            doc.autoTable({
-                html: '#summaryTable',
-                startY: 28,
-                theme: 'grid',
-                headStyles: { fillColor: [79, 70, 229] }
-            });
-            const filename = `Summary_Report_${getFilenameTimestamp()}.pdf`;
+            doc.autoTable({ html: '#summaryTable', startY: 28, theme: 'grid', headStyles: { fillColor: [79, 70, 229] } });
+            const filename = `Summary_Status_Truck_${cleanAngkutanName}_${getFilenameTimestamp()}.pdf`;
             doc.save(filename);
         };
 
-        const pageTitles = { home: 'Home', statusTruck: 'Status Truck', listTruck: 'List Truck', ritaseTruck: 'Laporan Ritase Truck', summaryReport: 'Summary Report' };
+        window.exportRitaseToExcel = () => {
+            const table = document.getElementById('ritaseTable');
+            const workbook = XLSX.utils.table_to_book(table, {sheet: "Laporan Ritase"});
+            const filename = `Laporan_Ritase_Admin_${getFilenameTimestamp()}.xlsx`;
+            XLSX.writeFile(workbook, filename);
+        };
+
+        window.exportRitaseToPdf = () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape' });
+            const timestamp = getFormattedTimestamp();
+            const title = "Ritase Truck";
+            doc.text(title, 14, 15);
+            doc.setFontSize(10);
+            doc.setTextColor(100);
+            doc.text(`Diekspor pada: ${timestamp}`, 14, 22);
+            doc.autoTable({ html: '#ritaseTable', startY: 28, theme: 'grid', headStyles: { fillColor: [79, 70, 229] } });
+            const filename = `Laporan_Ritase_Admin_${getFilenameTimestamp()}.pdf`;
+            doc.save(filename);
+        };
+
+        const pageTitles = { home: 'Home', statusTruck: 'Status Truck', listTruck: 'List Truck', ritaseTruck: 'Laporan Ritase Truck', summaryReport: 'Summary Report', logHistory: 'Riwayat Log' };
         window.showContent = (contentId) => {
             document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
             document.getElementById(contentId).classList.add('active');
@@ -942,21 +1237,34 @@
             if (contentId === 'summaryReport') renderSummaryReport();
             if (contentId === 'statusTruck') displayStatusCards();
             if (contentId === 'ritaseTruck') applyRitaseFiltersAndSort();
+            if (contentId === 'logHistory') fetchAndRenderLogs();
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             setInterval(updateRealTimeClock, 1000);
-            if (document.getElementById('copyright-year-login-admin')) {
-                document.getElementById('copyright-year-login-admin').textContent = new Date().getFullYear();
-            }
-            if (document.getElementById('copyright-year-login-vendor')) {
-                document.getElementById('copyright-year-login-vendor').textContent = new Date().getFullYear();
-            }
+            document.getElementById('copyright-year-login-admin').textContent = new Date().getFullYear();
             document.getElementById('loginButton').addEventListener('click', () => signInWithEmailAndPassword(auth, document.getElementById('loginEmail').value, document.getElementById('loginPassword').value).catch(e => document.getElementById('loginError').textContent = 'Email atau password salah.'));
             document.getElementById('logoutButton').addEventListener('click', () => signOut(auth));
             document.getElementById('copyright-year').textContent = new Date().getFullYear();
             document.getElementById('apply-filter-btn').addEventListener('click', applyHeaderFilters);
             document.getElementById('clear-filter-btn').addEventListener('click', clearHeaderFilters);
+            
+            document.getElementById('applyDateFilterBtn').addEventListener('click', applyRitaseFiltersAndSort);
+            document.getElementById('resetDateFilterBtn').addEventListener('click', () => {
+                document.getElementById('ritaseStartDate').value = '';
+                document.getElementById('ritaseEndDate').value = '';
+                applyRitaseFiltersAndSort();
+            });
+
+            // Event listener untuk filter di halaman log
+            document.getElementById('applyLogFilterBtn').addEventListener('click', applyLogFiltersAndSort);
+            document.getElementById('resetLogFilterBtn').addEventListener('click', () => {
+                document.getElementById('logStartDate').value = '';
+                document.getElementById('logEndDate').value = '';
+                document.getElementById('logSearchInput').value = '';
+                applyLogFiltersAndSort();
+            });
+
             document.addEventListener('click', (event) => {
                 const popup = document.getElementById('header-filter-popup');
                 if (!popup.classList.contains('hidden') && !popup.contains(event.target) && !event.target.closest('th[data-filter]')) {
